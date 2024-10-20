@@ -36,6 +36,8 @@ const App = () => {
     const maxIndex = votes.indexOf(maxVotes);
     setIndexMax(maxIndex);
   }
+  
+
 
 
 
