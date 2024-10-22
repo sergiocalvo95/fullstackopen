@@ -28,9 +28,7 @@ export const ListCoutries = ({countries, handleFilterChange}) => {
     if(countries.length >10) return 'Too many matches, specify another filter'
   
     if(countries.length == 1 && countryDetails && weather){
-      console.log(weather.weather[0].icon)
-  
-      return (
+     return (
         <div>
           <h1>{countryDetails.name.common}</h1>
           <p>capital {countryDetails.capital}
