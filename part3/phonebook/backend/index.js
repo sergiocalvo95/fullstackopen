@@ -49,19 +49,21 @@ app.get('/', (request,response) => {
 
 app.get('/api/persons', (request,response) => {
   // response.status(200).send(persons)
+  console.log("llamada")
   Person.find({}).then(persons => {
       response.json(persons)
     })
   })
 
 
-app.get('/info', (request,response) => {
-
-  response.status(200).send(
-    `Phonebook has info for ${persons.length} people <br/><br/>
-    ${new Date()}`
-  )
-})
+  app.get('/info', (request, response) => {
+    Person.countDocuments({}).then(count => {
+      response.status(200).send(
+        `Phonebook has info for ${count} people <br/><br/>
+        ${new Date()}`
+      )
+    })
+  })
 
 app.get('/api/persons/:id', (request, response )=>{
   const id = request.params.id
