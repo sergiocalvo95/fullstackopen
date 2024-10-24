@@ -153,8 +153,8 @@ const App = () => {
           setTimeout(() => {
             setNewNotification(null)
           }, 5000)
-      }).catch(() =>{
-        setNewError(`Information of ${newPerson.name} has already been removed from server`)
+      }).catch((error) =>{
+        setNewError(error.response.data.error)
         setTimeout(() => {
           setNewError(null)
         }, 5000)
