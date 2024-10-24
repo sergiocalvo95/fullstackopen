@@ -43,11 +43,11 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 
 
-app.get('/', (request,response) => {
+app.get('/', (request,response, next) => {
   response.status(200).send('<h1>server working</h1>')
 })
 
-app.get('/api/persons', (request,response) => {
+app.get('/api/persons', (request,response, next) => {
 // response.status(200).send(persons)
 Person.find({}).then(persons => {
     response.status(200).json(persons)
@@ -55,7 +55,7 @@ Person.find({}).then(persons => {
 })
 
 
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
   Person.countDocuments({}).then(count => {
     response.status(200).send(
       `Phonebook has info for ${count} people <br/><br/>
@@ -64,7 +64,7 @@ app.get('/info', (request, response) => {
   }).catch(error=> next(error))
 })
 
-app.get('/api/persons/:id', (request, response )=>{
+app.get('/api/persons/:id', (request, response, next )=>{
   const id = request.params.id
   // const person = persons.find(person => person.id===id)
   // response.status(302).send(person)
@@ -73,7 +73,7 @@ app.get('/api/persons/:id', (request, response )=>{
   }).catch(error=> next(error))
 })
 
-app.delete('/api/persons/:id', (request, response )=>{
+app.delete('/api/persons/:id', (request, response, next )=>{
   const id = request.params.id
   Person.findByIdAndDelete(id).then(result =>{
       if(result) response.status(204).end() 
@@ -82,7 +82,7 @@ app.delete('/api/persons/:id', (request, response )=>{
   })
 
 
-app.post('/api/persons/', (request, response ) =>{
+app.post('/api/persons/', (request, response, next ) =>{
   const body = request.body
 
   if(!body.name || !body.number){
@@ -102,12 +102,12 @@ app.post('/api/persons/', (request, response ) =>{
 
         newPerson.save().then(savedPerson => {
           response.status(201).json(savedPerson)
-        })
+        }).catch(error=> next(error))
       }
     }).catch(error=> next(error))
 })
 
-app.put('/api/persons/:id', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
   const id = request.params.id
   const body = request.body
   const newPerson = { name: body.name, number: body.number }
@@ -125,19 +125,17 @@ app.put('/api/persons/:id', (request, response) => {
 
 })
 
-const unknownEndpoint = (request, response) => {
+const unknownEndpoint = (request, response, next) => {
   response.status(404).send({ error: 'unknown endpoint' })
 }
 
 app.use(unknownEndpoint)
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error.message)
-
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   }else if (error.name === 'ValidationError') {
-    return response.status(400).send({ error: error.message })
+    return response.status(400).json({ error: error.message })
   }
   next(error)
 }
