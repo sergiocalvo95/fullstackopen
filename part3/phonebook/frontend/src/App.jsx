@@ -172,6 +172,7 @@ const App = () => {
         }, 5000)
       })
     .catch((error) =>{
+      console.log(error)
       setNewError(error.response.data.error)
       setTimeout(() => {
         setNewError(null)
