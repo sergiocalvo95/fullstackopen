@@ -29,11 +29,11 @@ const Person = require('./models/person')
 //     }
 // ]
 
-
 const app = express()
-app.use(express.json())
-app.use(cors())
 app.use(express.static('dist'))
+app.use(cors())
+app.use(express.json())
+
 
 morgan.token('body', (req) => {
   return req.method === 'POST' ? JSON.stringify(req.body) : ''; // Solo incluir el cuerpo en POST
@@ -86,7 +86,7 @@ app.delete('/api/persons/:id', (request, response )=>{
     const body = request.body
 
     if(!body.name || !body.number){
-      response.status(400).send({ error: 'Name or number is missing' })
+      return response.status(400).send({ error: 'Name or number is missing' })
     }
 
     Person.findOne({ name: body.name })
@@ -114,7 +114,7 @@ app.delete('/api/persons/:id', (request, response )=>{
     Person.findByIdAndUpdate(
       id, 
       newPerson, 
-      { new: true}
+      { new: true, runValidators: true, context: 'query'}
     ).then(updatedPerson => {
         if (updatedPerson) {
           response.status(200).json(updatedPerson)
@@ -136,8 +136,9 @@ app.delete('/api/persons/:id', (request, response )=>{
 
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
-    } 
-  
+    }else if (error.name === 'ValidationError') {
+      return response.status(400).json({ error: error.message })
+    }
     next(error)
   }
 

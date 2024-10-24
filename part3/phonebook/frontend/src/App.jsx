@@ -171,8 +171,8 @@ const App = () => {
           setNewNotification(null)
         }, 5000)
       })
-    .catch(() =>{
-      setNewError(`${newPerson.name} can't been added`)
+    .catch((error) =>{
+      setNewError(error.response.data.error)
       setTimeout(() => {
         setNewError(null)
       }, 5000)
